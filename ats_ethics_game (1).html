@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Compliance Engine — ATS Ethics Game</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg:        #f5f3ee;
+  --bg2:       #ede9e1;
+  --surface:   #ffffff;
+  --border:    #d6d0c4;
+  --border2:   #c0b9ab;
+  --text:      #1a1714;
+  --text-body: #3d3830;
+  --text-dim:  #7a7266;
+  --text-muted:#a89f93;
+  --red:       #c0392b;
+  --red-light: #fdf2f0;
+  --red-mid:   #f5c6c0;
+  --amber:     #b45309;
+  --amber-light:#fffbeb;
+  --green:     #166534;
+  --green-light:#f0fdf4;
+  --green-mid: #bbf7d0;
+  --ink:       #1a1714;
+  --stamp-red: #c0392b;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Sora',sans-serif;
+  font-size:15px;
+  line-height:1.65;
+  min-height:100vh;
+}
+
+/* ── HEADER ─────────────────────────────── */
+.header{
+  background:var(--ink);
+  color:#f5f3ee;
+  padding:0 40px;
+  height:56px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.logo{
+  font-family:'Playfair Display',serif;
+  font-style:italic;
+  font-size:18px;
+  letter-spacing:0.02em;
+}
+.logo em{font-style:normal;color:#e8c97e;}
+.header-tag{
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:#a89f93;
+}
+
+/* ── LAYOUT ─────────────────────────────── */
+.page{max-width:900px;margin:0 auto;padding:48px 32px 100px;}
+
+/* ── HERO ───────────────────────────────── */
+.hero{
+  background:var(--ink);
+  color:#f5f3ee;
+  padding:52px 48px;
+  margin-bottom:40px;
+  position:relative;
+  overflow:hidden;
+}
+.hero::after{
+  content:'ATS';
+  position:absolute;
+  right:-10px;bottom:-20px;
+  font-family:'Playfair Display',serif;
+  font-size:140px;
+  font-weight:700;
+  color:rgba(255,255,255,0.04);
+  pointer-events:none;
+  line-height:1;
+}
+.hero-eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:#e8c97e;
+  margin-bottom:18px;
+}
+.hero-eyebrow span{
+  display:inline-block;width:24px;height:1px;background:#e8c97e;
+}
+.hero h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(30px,4.5vw,52px);
+  font-weight:700;
+  line-height:1.12;
+  margin-bottom:20px;
+}
+.hero h1 i{font-style:italic;color:#e8c97e;}
+.hero-desc{
+  font-size:14px;
+  line-height:1.75;
+  color:#c0b9ab;
+  max-width:580px;
+}
+.hero-desc strong{color:#f5f3ee;}
+
+/* ── STAGE BAR ──────────────────────────── */
+.stages{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:0;
+  border:1px solid var(--border2);
+  background:var(--surface);
+  margin-bottom:40px;
+  overflow:hidden;
+}
+.stage{
+  padding:14px 18px;
+  border-right:1px solid var(--border);
+  transition:background 0.3s,border-bottom 0.3s;
+  border-bottom:3px solid transparent;
+}
+.stage:last-child{border-right:none;}
+.stage.active{background:#fff8f7;border-bottom-color:var(--red);}
+.stage.done{background:var(--green-light);border-bottom-color:var(--green);}
+.stage-n{
+  font-size:10px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--text-muted);margin-bottom:4px;
+}
+.stage.active .stage-n{color:var(--red);}
+.stage.done   .stage-n{color:var(--green);}
+.stage-label{
+  font-size:12px;font-weight:600;color:var(--text-dim);
+}
+.stage.active .stage-label{color:var(--text);}
+.stage.done   .stage-label{color:var(--green);}
+
+/* ── SECTION ────────────────────────────── */
+.section{margin-bottom:48px;}
+.section-rule{
+  display:flex;align-items:center;gap:14px;margin-bottom:22px;
+}
+.section-rule-num{
+  font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--red);white-space:nowrap;
+}
+.section-rule-line{flex:1;height:1px;background:var(--border);}
+.section h2{
+  font-family:'Playfair Display',serif;
+  font-size:26px;font-weight:700;
+  margin-bottom:6px;
+}
+.section-sub{
+  font-size:13px;color:var(--text-dim);margin-bottom:20px;
+}
+
+/* ── JOB SELECTOR ───────────────────────── */
+.job-selector{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+  margin-bottom:28px;
+}
+.job-btn{
+  background:var(--surface);
+  border:2px solid var(--border);
+  padding:16px 20px;
+  cursor:pointer;
+  text-align:left;
+  transition:all 0.2s;
+  border-radius:0;
+  font-family:'Sora',sans-serif;
+}
+.job-btn:hover{border-color:var(--border2);background:var(--bg2);}
+.job-btn.selected{
+  border-color:var(--ink);
+  background:var(--ink);
+  color:#f5f3ee;
+}
+.job-btn-title{
+  font-size:14px;font-weight:700;margin-bottom:3px;
+  display:flex;align-items:center;gap:8px;
+}
+.job-btn-tag{
+  font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;
+  padding:2px 7px;
+  background:var(--bg2);color:var(--text-dim);
+  border:1px solid var(--border);
+}
+.job-btn.selected .job-btn-tag{background:rgba(255,255,255,0.12);color:#e8c97e;border-color:transparent;}
+.job-btn-desc{font-size:12px;color:var(--text-dim);}
+.job-btn.selected .job-btn-desc{color:#c0b9ab;}
+
+/* ── JD CARD ────────────────────────────── */
+.jd-card{
+  background:var(--surface);
+  border:1px solid var(--border2);
+}
+.jd-top{
+  background:var(--bg2);
+  padding:20px 24px;
+  border-bottom:1px solid var(--border);
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:20px;
+}
+.jd-meta-item label{
+  font-size:10px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--text-muted);display:block;margin-bottom:4px;
+}
+.jd-meta-item span{font-size:13px;font-weight:500;color:var(--text);}
+.jd-body{padding:24px 28px;}
+.jd-body h3{
+  font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--red);margin:22px 0 10px;
+}
+.jd-body h3:first-child{margin-top:0;}
+.jd-body p{font-size:14px;line-height:1.75;color:var(--text-body);margin-bottom:10px;}
+.jd-body ul{list-style:none;padding:0;}
+.jd-body li{
+  font-size:14px;line-height:1.7;color:var(--text-body);
+  padding:5px 0 5px 18px;position:relative;border-bottom:1px solid var(--bg2);
+}
+.jd-body li:last-child{border-bottom:none;}
+.jd-body li::before{
+  content:'→';position:absolute;left:0;color:var(--red);font-size:12px;
+}
+
+/* ── KEYWORD CLOUD ──────────────────────── */
+.kw-panel{
+  margin-top:20px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  padding:20px;
+}
+.kw-panel-label{
+  font-size:11px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--text-muted);margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.kw-panel-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.kw-cloud{display:flex;flex-wrap:wrap;gap:7px;}
+.kw{
+  font-size:11px;font-weight:500;letter-spacing:0.05em;
+  border:1px solid var(--border);
+  padding:5px 11px;
+  transition:all 0.3s;
+  color:var(--text-dim);
+  background:var(--bg2);
+}
+.kw.found{
+  border-color:var(--green);color:var(--green);
+  background:var(--green-light);
+}
+.kw.missing{
+  border-color:var(--red);color:var(--red);
+  background:var(--red-light);
+}
+
+/* ── RESUME INPUT ───────────────────────── */
+.resume-box{
+  background:var(--surface);
+  border:2px solid var(--border);
+  transition:border-color 0.25s;
+}
+.resume-box:focus-within{border-color:var(--ink);}
+.resume-box-header{
+  padding:12px 18px;
+  border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+  background:var(--bg2);
+}
+.resume-box-header span{
+  font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--text-muted);
+}
+textarea.resume-input{
+  width:100%;min-height:260px;padding:20px;
+  background:transparent;border:none;outline:none;
+  font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.75;
+  color:var(--text-body);resize:vertical;
+}
+textarea.resume-input::placeholder{color:var(--text-muted);}
+
+/* ── BUTTON ─────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:13px 26px;
+  font-family:'Sora',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:0.08em;text-transform:uppercase;
+  border:2px solid;cursor:pointer;transition:all 0.2s;
+  background:transparent;
+}
+.btn-dark{border-color:var(--ink);color:var(--ink);}
+.btn-dark:hover{background:var(--ink);color:#f5f3ee;}
+.btn-dark:disabled{
+  border-color:var(--border2);color:var(--text-muted);cursor:not-allowed;
+}
+.btn-dark:disabled:hover{background:transparent;color:var(--text-muted);}
+
+/* ── SCORE ───────────────────────────────── */
+.score-card{
+  display:grid;grid-template-columns:180px 1fr;
+  border:1px solid var(--border2);background:var(--surface);
+  overflow:hidden;margin-bottom:20px;
+}
+.score-left{
+  background:var(--ink);color:#f5f3ee;
+  padding:32px 24px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;
+}
+.score-label-sm{
+  font-size:10px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;
+  color:#a89f93;margin-bottom:10px;
+}
+.score-big{
+  font-family:'Playfair Display',serif;
+  font-size:68px;font-weight:700;line-height:1;
+  transition:color 0.4s;
+}
+.score-of{font-size:13px;color:#7a7266;margin-top:6px;letter-spacing:0.1em;}
+.score-poor{color:#f87171;}
+.score-mid {color:#fbbf24;}
+.score-ok  {color:#86efac;}
+.score-good{color:#4ade80;}
+
+.score-right{padding:28px 32px;}
+.score-verdict{
+  font-family:'Playfair Display',serif;
+  font-size:22px;font-style:italic;font-weight:700;
+  margin-bottom:12px;color:var(--text);
+}
+.score-body{font-size:13px;line-height:1.75;color:var(--text-body);}
+
+/* ── INDIVIDUALITY METERS ───────────────── */
+.i-meter{
+  background:var(--surface);border:1px solid var(--border);
+  padding:22px 24px;margin-bottom:20px;
+}
+.i-meter-hdr{
+  font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--text-dim);margin-bottom:18px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.i-meter-hdr strong{color:var(--red);}
+.meter-row{display:flex;align-items:center;gap:14px;margin-bottom:12px;}
+.meter-name{
+  font-size:12px;font-weight:500;color:var(--text-body);
+  width:160px;flex-shrink:0;
+}
+.meter-track{
+  flex:1;height:6px;background:var(--bg2);
+  border:1px solid var(--border);overflow:hidden;
+}
+.meter-fill{height:100%;transition:width 1.1s cubic-bezier(0.16,1,0.3,1);}
+.meter-pct{
+  font-size:12px;font-weight:600;font-family:'JetBrains Mono',monospace;
+  width:38px;text-align:right;color:var(--text-dim);
+}
+.meter-note{
+  font-size:12px;color:var(--text-dim);line-height:1.7;
+  border-top:1px solid var(--border);padding-top:14px;margin-top:6px;
+}
+.meter-note strong{color:var(--red);}
+
+/* ── RESULTS GRID ───────────────────────── */
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.result-box{
+  background:var(--surface);border:1px solid var(--border);padding:18px;
+}
+.result-box-title{
+  font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;
+  margin-bottom:12px;
+}
+.result-box.found-box .result-box-title{color:var(--green);}
+.result-box.missing-box .result-box-title{color:var(--red);}
+.result-box .kw-cloud{gap:6px;}
+
+/* ── LOADING ─────────────────────────────── */
+.loading{
+  display:flex;align-items:center;gap:14px;
+  padding:28px 24px;
+  background:var(--surface);border:1px solid var(--border);
+  font-size:13px;color:var(--text-dim);
+}
+.dots{display:flex;gap:5px;}
+.dots span{
+  width:7px;height:7px;border-radius:50%;background:var(--ink);
+  animation:pulse 1.1s ease-in-out infinite;
+}
+.dots span:nth-child(2){animation-delay:0.18s;}
+.dots span:nth-child(3){animation-delay:0.36s;}
+@keyframes pulse{0%,100%{opacity:0.2;transform:scale(0.7);}50%{opacity:1;transform:scale(1);}}
+
+/* ── ETHICS NOTICE ──────────────────────── */
+.notice{
+  display:flex;gap:16px;align-items:flex-start;
+  padding:20px 22px;margin-bottom:20px;
+}
+.notice.amber{
+  background:var(--amber-light);
+  border:1px solid #fcd34d;border-left:4px solid var(--amber);
+}
+.notice.red-notice{
+  background:var(--red-light);
+  border:1px solid var(--red-mid);border-left:4px solid var(--red);
+}
+.notice-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.notice-title{
+  font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;
+  margin-bottom:5px;
+}
+.notice.amber .notice-title{color:var(--amber);}
+.notice.red-notice .notice-title{color:var(--red);}
+.notice-text{font-size:13px;line-height:1.7;color:var(--text-body);}
+.notice-text strong{color:var(--text);}
+
+/* ── SUGGESTION CARDS ───────────────────── */
+.sugg-card{
+  background:var(--surface);
+  border:1px solid var(--border2);
+  margin-bottom:16px;
+  overflow:hidden;
+  animation:fadeUp 0.4s ease both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+.sugg-card-top{
+  background:var(--bg2);
+  padding:12px 20px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.sugg-tag{
+  font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--red);
+}
+.sugg-kw{
+  font-size:11px;font-weight:600;
+  background:var(--ink);color:#e8c97e;
+  padding:3px 10px;letter-spacing:0.06em;
+}
+.sugg-cols{
+  display:grid;grid-template-columns:1fr 1fr;
+}
+.sugg-col{padding:20px;}
+.sugg-col+.sugg-col{border-left:1px solid var(--border);}
+.sugg-col-label{
+  font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;
+  margin-bottom:10px;
+}
+.sugg-col.orig .sugg-col-label{color:var(--text-muted);}
+.sugg-col.comp .sugg-col-label{color:var(--red);}
+.sugg-text{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;line-height:1.75;
+  padding:14px;
+  border:1px solid var(--border);
+}
+.sugg-col.orig .sugg-text{
+  background:var(--bg2);color:var(--text-body);
+}
+.sugg-col.comp .sugg-text{
+  background:#fff8f7;color:var(--text);
+  border-color:var(--red-mid);
+}
+.sugg-footer{
+  padding:12px 20px;
+  border-top:1px solid var(--border);
+  font-size:12px;font-style:italic;
+  color:var(--text-dim);
+  background:var(--bg2);
+  display:flex;align-items:flex-start;gap:8px;
+}
+.sugg-footer::before{content:'⚠';font-style:normal;color:var(--amber);}
+
+/* ── STAMP + REFLECTION ─────────────────── */
+.stamp-wrap{display:flex;justify-content:center;margin:36px 0 24px;}
+.stamp{
+  display:inline-block;
+  border:4px solid var(--stamp-red);
+  color:var(--stamp-red);
+  padding:10px 28px;
+  font-family:'Playfair Display',serif;
+  font-size:38px;font-weight:700;letter-spacing:0.18em;
+  transform:rotate(-6deg);
+  opacity:0.7;
+  animation:fadeUp 0.3s ease;
+}
+
+.reflection{
+  background:var(--ink);color:#f5f3ee;
+  padding:36px 40px;margin-bottom:32px;
+}
+.reflection-eyebrow{
+  font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;
+  color:#e8c97e;margin-bottom:14px;
+}
+.reflection-quote{
+  font-family:'Playfair Display',serif;
+  font-size:20px;font-style:italic;font-weight:400;
+  color:#e8c97e;margin-bottom:18px;line-height:1.5;
+}
+.reflection-body{font-size:14px;line-height:1.8;color:#c0b9ab;}
+.reflection-body strong{color:#f5f3ee;}
+
+.reset-row{text-align:center;padding-top:28px;border-top:1px solid var(--border);}
+
+/* ── HIDDEN ──────────────────────────────── */
+.hidden{display:none!important;}
+
+/* ── RESPONSIVE ─────────────────────────── */
+@media(max-width:700px){
+  .page{padding:28px 16px 80px;}
+  .hero{padding:36px 24px;}
+  .job-selector{grid-template-columns:1fr;}
+  .jd-top{grid-template-columns:1fr;}
+  .stages{grid-template-columns:1fr 1fr;}
+  .score-card{grid-template-columns:1fr;}
+  .results-grid{grid-template-columns:1fr;}
+  .sugg-cols{grid-template-columns:1fr;}
+  .sugg-col+.sugg-col{border-left:none;border-top:1px solid var(--border);}
+  .meter-name{width:110px;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">The <em>Compliance</em> Engine</div>
+  <div class="header-tag">ATS Ethics Simulator</div>
+</div>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow"><span></span>Interactive Ethics Critique<span></span></div>
+    <h1>Can you survive<br>the <i>machine?</i></h1>
+    <p class="hero-desc">
+      Applicant Tracking Systems filter roughly <strong>75% of resumes</strong> before a human ever reads them.
+      This simulation makes you feel that process — and asks what you trade away to pass it.
+    </p>
+  </div>
+
+  <!-- STAGES -->
+  <div class="stages" id="stageBar">
+    <div class="stage active" id="st-1"><div class="stage-n">01</div><div class="stage-label">Choose a Role</div></div>
+    <div class="stage"       id="st-2"><div class="stage-n">02</div><div class="stage-label">Submit Yourself</div></div>
+    <div class="stage"       id="st-3"><div class="stage-n">03</div><div class="stage-label">ATS Scan</div></div>
+    <div class="stage"       id="st-4"><div class="stage-n">04</div><div class="stage-label">Comply or Fail</div></div>
+  </div>
+
+  <!-- ── SECTION 1: CHOOSE A ROLE ─────────── -->
+  <div class="section" id="sec-role">
+    <div class="section-rule">
+      <div class="section-rule-num">// 01</div>
+      <div class="section-rule-line"></div>
+    </div>
+    <h2>Pick Your Role</h2>
+    <p class="section-sub">Select the job description you're applying for. Each role has its own ATS keyword matrix.</p>
+
+    <div class="job-selector">
+      <button class="job-btn" id="jbtn-uxr" onclick="selectJob('uxr')">
+        <div class="job-btn-title">
+          UX Researcher
+          <span class="job-btn-tag">UXR</span>
+        </div>
+        <div class="job-btn-desc">Senior researcher uncovering user behaviours to guide product decisions through qualitative and quantitative methods.</div>
+      </button>
+      <button class="job-btn" id="jbtn-uxd" onclick="selectJob('uxd')">
+        <div class="job-btn-title">
+          UX Designer
+          <span class="job-btn-tag">UXD</span>
+        </div>
+        <div class="job-btn-desc">Mid–senior designer crafting user-centred interfaces from concept through delivery, working closely with product and engineering.</div>
+      </button>
+      <button class="job-btn" id="jbtn-pd" onclick="selectJob('pd')">
+        <div class="job-btn-title">
+          Product Designer
+          <span class="job-btn-tag">PD</span>
+        </div>
+        <div class="job-btn-desc">Full-stack designer owning product strategy, systems thinking, and visual execution across a SaaS platform.</div>
+      </button>
+      <button class="job-btn" id="jbtn-uxw" onclick="selectJob('uxw')">
+        <div class="job-btn-title">
+          UX Writer / Content Designer
+          <span class="job-btn-tag">UXW</span>
+        </div>
+        <div class="job-btn-desc">Content strategist shaping product voice, microcopy, and information architecture to reduce cognitive load.</div>
+      </button>
+    </div>
+
+    <!-- JD panel (filled by JS) -->
+    <div id="jd-panel" class="hidden">
+      <div class="jd-card">
+        <div class="jd-top">
+          <div class="jd-meta-item"><label>Position</label><span id="jd-title">—</span></div>
+          <div class="jd-meta-item"><label>Company</label><span id="jd-company">—</span></div>
+          <div class="jd-meta-item"><label>Location</label><span id="jd-location">—</span></div>
+        </div>
+        <div class="jd-body" id="jd-body"><!-- filled by JS --></div>
+      </div>
+
+      <div class="kw-panel" id="kw-panel">
+        <div class="kw-panel-label">ATS Target Keywords</div>
+        <div class="kw-cloud" id="kw-cloud"><!-- filled by JS --></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 2: RESUME INPUT ───────────── -->
+  <div class="section hidden" id="sec-resume">
+    <div class="section-rule">
+      <div class="section-rule-num">// 02</div>
+      <div class="section-rule-line"></div>
+    </div>
+    <h2>Write as Yourself</h2>
+    <p class="section-sub">Paste your resume text below — your real words, your real experience. Don't optimise yet. Then watch what happens.</p>
+
+    <div class="resume-box">
+      <div class="resume-box-header">
+        <span>Resume Text</span>
+        <span id="charCount">0 characters</span>
+      </div>
+      <textarea class="resume-input" id="resumeInput"
+        placeholder="Paste or type your experience here — naturally, in your own voice.&#10;&#10;e.g. 'I spent three years at a startup helping teams build things people actually wanted to use. I sat with real users, ran sessions, built rough prototypes, and slowly made complicated things simpler. I care about making technology feel human...'"
+      ></textarea>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;margin-top:14px;">
+      <button class="btn btn-dark" id="scanBtn" onclick="runScan()" disabled>
+        ▶ &nbsp;Run ATS Scan
+      </button>
+    </div>
+  </div>
+
+  <!-- ── SECTION 3: RESULTS ─────────────────── -->
+  <div class="section hidden" id="sec-results">
+    <div class="section-rule">
+      <div class="section-rule-num">// 03</div>
+      <div class="section-rule-line"></div>
+    </div>
+    <h2>The Machine Has Judged You</h2>
+
+    <div id="loadingResults" class="loading hidden">
+      <div class="dots"><span></span><span></span><span></span></div>
+      Scanning your resume through the compliance filter…
+    </div>
+
+    <div id="resultsContent" class="hidden">
+
+      <div class="score-card">
+        <div class="score-left">
+          <div class="score-label-sm">ATS Score</div>
+          <div class="score-big" id="scoreNum">—</div>
+          <div class="score-of">out of 100</div>
+        </div>
+        <div class="score-right">
+          <div class="score-verdict" id="scoreVerdict">Calculating…</div>
+          <div class="score-body" id="scoreBody"></div>
+        </div>
+      </div>
+
+      <div class="i-meter">
+        <div class="i-meter-hdr">
+          <span>What you stand to lose</span>
+          <strong>Individuality ↔ Compliance</strong>
+        </div>
+        <div class="meter-row">
+          <div class="meter-name">Voice &amp; Personality</div>
+          <div class="meter-track"><div class="meter-fill" id="mf-voice" style="width:0%;background:#4ade80;"></div></div>
+          <div class="meter-pct" id="mv-voice">—</div>
+        </div>
+        <div class="meter-row">
+          <div class="meter-name">Authentic Language</div>
+          <div class="meter-track"><div class="meter-fill" id="mf-lang" style="width:0%;background:#fbbf24;"></div></div>
+          <div class="meter-pct" id="mv-lang">—</div>
+        </div>
+        <div class="meter-row">
+          <div class="meter-name">Keyword Compliance</div>
+          <div class="meter-track"><div class="meter-fill" id="mf-kw" style="width:0%;background:#f87171;"></div></div>
+          <div class="meter-pct" id="mv-kw">—</div>
+        </div>
+        <div class="meter-note">
+          As ATS compliance rises, voice and authentic language fall. <strong>This is the trade the system was designed to force.</strong>
+        </div>
+      </div>
+
+      <div class="results-grid">
+        <div class="result-box found-box">
+          <div class="result-box-title">✓ Keywords Found</div>
+          <div class="kw-cloud" id="foundKws"></div>
+        </div>
+        <div class="result-box missing-box">
+          <div class="result-box-title">✗ Keywords Missing</div>
+          <div class="kw-cloud" id="missingKws"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── SECTION 4: SUGGESTIONS ─────────────── -->
+  <div class="section hidden" id="sec-sugg">
+    <div class="section-rule">
+      <div class="section-rule-num">// 04</div>
+      <div class="section-rule-line"></div>
+    </div>
+    <h2>The Price of Compliance</h2>
+
+    <div class="notice amber">
+      <div class="notice-icon">⚖</div>
+      <div>
+        <div class="notice-title">Ethical Notice</div>
+        <div class="notice-text">
+          The rewrites below will raise your ATS score — but each one converts your specific experience
+          into a corporate keyword. Your story becomes a checklist.
+          <strong>This is not a flaw in the system. It is the system working exactly as intended.</strong>
+        </div>
+      </div>
+    </div>
+
+    <div id="loadingSugg" class="loading hidden">
+      <div class="dots"><span></span><span></span><span></span></div>
+      Generating compliance modifications…
+    </div>
+
+    <div id="suggContent"></div>
+
+    <!-- Final reflection -->
+    <div id="finalBlock" class="hidden">
+      <div class="stamp-wrap"><div class="stamp">PROCESSED</div></div>
+
+      <div class="reflection">
+        <div class="reflection-eyebrow">■ Reflection</div>
+        <div class="reflection-quote" id="closingQuote">"…"</div>
+        <div class="reflection-body" id="reflectionBody">
+          You have passed the machine. The version of you that emerges speaks its dialect — precise, keyword-dense, optimised.<br><br>
+          But somewhere between your original words and the compliant draft, something was quietly discarded.<br><br>
+          <strong>The question worth sitting with:</strong> when every applicant optimises for the same system, what gets lost — not just for individuals, but for the teams, organisations, and the humans they design for?
+        </div>
+      </div>
+
+      <div class="reset-row">
+        <button class="btn btn-dark" onclick="resetGame()">↺ &nbsp;Start Over</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+// ─────────────────────────────────────────────────────────
+// JOB DATA
+// ─────────────────────────────────────────────────────────
+const JOBS = {
+
+  uxr: {
+    title: 'Senior UX Researcher',
+    company: 'NexCorpTech Solutions',
+    location: 'Hybrid — San Francisco',
+    jd: `
+      <h3>About the Role</h3>
+      <p>We are seeking a <strong>Senior UX Researcher</strong> with deep expertise in <strong>Human-Computer Interaction (HCI)</strong> to join our product design team. You will lead research that informs strategy and drives measurable outcomes.</p>
+      <h3>Key Responsibilities</h3>
+      <ul>
+        <li>Lead end-to-end <strong>user research</strong> including <strong>usability testing</strong>, <strong>contextual inquiry</strong>, and <strong>ethnographic studies</strong></li>
+        <li>Develop <strong>user personas</strong>, <strong>journey maps</strong>, and <strong>empathy maps</strong> to communicate findings</li>
+        <li>Apply both <strong>qualitative research</strong> and <strong>quantitative research</strong> methods</li>
+        <li>Conduct <strong>heuristic evaluation</strong> and <strong>cognitive walkthroughs</strong></li>
+        <li>Use <strong>affinity mapping</strong> and <strong>thematic analysis</strong> to synthesise data</li>
+        <li>Champion <strong>accessibility</strong> and <strong>inclusive design</strong> across the org</li>
+        <li>Apply <strong>behavioral analytics</strong> to complement primary research</li>
+      </ul>
+      <h3>Requirements</h3>
+      <ul>
+        <li>5+ years in <strong>UX research</strong> or a related <strong>HCI</strong> field</li>
+        <li>Experience with <strong>A/B testing</strong> and survey design</li>
+        <li>Strong <strong>stakeholder management</strong> skills</li>
+        <li>Proficiency with <strong>Figma</strong>, Dovetail, or similar tools</li>
+        <li>Experience with <strong>data visualization</strong> to present research</li>
+        <li>Background in <strong>human-centered design</strong> practice</li>
+        <li>Familiarity with <strong>interaction design</strong> principles</li>
+      </ul>`,
+    keywords: [
+      {id:'uxr-1', match:'ux research',              label:'UX Research'},
+      {id:'uxr-2', match:'hci',                       label:'HCI'},
+      {id:'uxr-3', match:'usability testing',         label:'Usability Testing'},
+      {id:'uxr-4', match:'user persona',              label:'User Personas'},
+      {id:'uxr-5', match:'journey map',               label:'Journey Maps'},
+      {id:'uxr-6', match:'empathy map',               label:'Empathy Maps'},
+      {id:'uxr-7', match:'human-centered design',     label:'Human-Centered Design'},
+      {id:'uxr-8', match:'qualitative',               label:'Qualitative Research'},
+      {id:'uxr-9', match:'quantitative',              label:'Quantitative Research'},
+      {id:'uxr-10',match:'heuristic',                 label:'Heuristic Evaluation'},
+      {id:'uxr-11',match:'contextual inquiry',        label:'Contextual Inquiry'},
+      {id:'uxr-12',match:'affinity map',              label:'Affinity Mapping'},
+      {id:'uxr-13',match:'thematic analysis',         label:'Thematic Analysis'},
+      {id:'uxr-14',match:'accessibility',             label:'Accessibility'},
+      {id:'uxr-15',match:'inclusive design',          label:'Inclusive Design'},
+      {id:'uxr-16',match:'figma',                     label:'Figma'},
+      {id:'uxr-17',match:'a/b testing',               label:'A/B Testing'},
+      {id:'uxr-18',match:'data visualization',        label:'Data Visualization'},
+      {id:'uxr-19',match:'stakeholder',               label:'Stakeholder Management'},
+      {id:'uxr-20',match:'behavioral analytics',      label:'Behavioral Analytics'},
+      {id:'uxr-21',match:'cognitive walkthrough',     label:'Cognitive Walkthrough'},
+      {id:'uxr-22',match:'interaction design',        label:'Interaction Design'},
+    ],
+  },
+
+  uxd: {
+    title: 'Senior UX Designer',
+    company: 'Meridian Digital Studio',
+    location: 'Remote — US & Europe',
+    jd: `
+      <h3>About the Role</h3>
+      <p>Meridian is looking for a <strong>Senior UX Designer</strong> to shape products that millions of people use daily. You'll work across the full design cycle — from discovery to delivery — in close partnership with product managers and engineers.</p>
+      <h3>Key Responsibilities</h3>
+      <ul>
+        <li>Create <strong>wireframes</strong>, <strong>prototypes</strong>, and high-fidelity <strong>UI design</strong> in <strong>Figma</strong></li>
+        <li>Build and maintain a comprehensive <strong>design system</strong></li>
+        <li>Define and own <strong>information architecture</strong> for complex flows</li>
+        <li>Ensure <strong>responsive design</strong> and <strong>mobile-first</strong> delivery</li>
+        <li>Run <strong>usability testing</strong> and incorporate feedback iteratively</li>
+        <li>Apply <strong>interaction design</strong> and <strong>motion design</strong> principles</li>
+        <li>Champion <strong>accessibility</strong> (WCAG 2.1 AA) standards throughout</li>
+        <li>Translate <strong>user research</strong> insights into validated design solutions</li>
+        <li>Collaborate in <strong>cross-functional</strong> agile ceremonies</li>
+      </ul>
+      <h3>Requirements</h3>
+      <ul>
+        <li>4+ years experience as a UX or <strong>product designer</strong></li>
+        <li>Expert-level <strong>Figma</strong> skills; familiarity with <strong>Sketch</strong> or <strong>Adobe XD</strong></li>
+        <li>Experience with <strong>user-centered design</strong> processes end-to-end</li>
+        <li>Strong <strong>visual design</strong> and typography sensibility</li>
+        <li>Understanding of <strong>design tokens</strong> and component-based thinking</li>
+        <li>Ability to communicate design rationale to <strong>stakeholders</strong></li>
+        <li>Portfolio showing <strong>human-centered design</strong> outcomes</li>
+      </ul>`,
+    keywords: [
+      {id:'uxd-1', match:'wireframe',                 label:'Wireframes'},
+      {id:'uxd-2', match:'prototype',                 label:'Prototyping'},
+      {id:'uxd-3', match:'ui design',                 label:'UI Design'},
+      {id:'uxd-4', match:'figma',                     label:'Figma'},
+      {id:'uxd-5', match:'design system',             label:'Design System'},
+      {id:'uxd-6', match:'information architecture',  label:'Information Architecture'},
+      {id:'uxd-7', match:'responsive design',         label:'Responsive Design'},
+      {id:'uxd-8', match:'mobile-first',              label:'Mobile-First'},
+      {id:'uxd-9', match:'usability testing',         label:'Usability Testing'},
+      {id:'uxd-10',match:'interaction design',        label:'Interaction Design'},
+      {id:'uxd-11',match:'motion design',             label:'Motion Design'},
+      {id:'uxd-12',match:'accessibility',             label:'Accessibility'},
+      {id:'uxd-13',match:'user research',             label:'User Research'},
+      {id:'uxd-14',match:'user-centered design',      label:'User-Centered Design'},
+      {id:'uxd-15',match:'human-centered design',     label:'Human-Centered Design'},
+      {id:'uxd-16',match:'visual design',             label:'Visual Design'},
+      {id:'uxd-17',match:'design token',              label:'Design Tokens'},
+      {id:'uxd-18',match:'sketch',                    label:'Sketch'},
+      {id:'uxd-19',match:'cross-functional',          label:'Cross-Functional'},
+      {id:'uxd-20',match:'stakeholder',               label:'Stakeholder Communication'},
+      {id:'uxd-21',match:'product designer',          label:'Product Designer'},
+      {id:'uxd-22',match:'wcag',                      label:'WCAG'},
+    ],
+  },
+
+  pd: {
+    title: 'Lead Product Designer',
+    company: 'Vanta Labs',
+    location: 'On-site — New York, NY',
+    jd: `
+      <h3>About the Role</h3>
+      <p>Vanta Labs is growing fast and needs a <strong>Lead Product Designer</strong> who thinks in systems, moves in ambiguity, and builds with engineers. You'll define the experience strategy for our flagship SaaS platform and grow a small design team.</p>
+      <h3>Key Responsibilities</h3>
+      <ul>
+        <li>Own end-to-end <strong>product design</strong> from discovery through post-launch iteration</li>
+        <li>Drive <strong>design strategy</strong> and align it to business and user outcomes</li>
+        <li>Build and scale a multi-brand <strong>design system</strong> with a strong <strong>design language</strong></li>
+        <li>Synthesise <strong>user research</strong>, <strong>data analytics</strong>, and business goals into design decisions</li>
+        <li>Facilitate <strong>design thinking</strong> workshops and <strong>ideation</strong> sessions</li>
+        <li>Deliver polished <strong>high-fidelity prototypes</strong> and <strong>UI specifications</strong></li>
+        <li>Define <strong>KPIs</strong> and use <strong>A/B testing</strong> to validate design hypothesis</li>
+        <li>Embed <strong>accessibility</strong> from day one of every project</li>
+        <li>Mentor junior designers and champion a culture of <strong>user advocacy</strong></li>
+      </ul>
+      <h3>Requirements</h3>
+      <ul>
+        <li>6+ years as a <strong>product designer</strong> with SaaS or B2B experience</li>
+        <li>Proficiency in <strong>Figma</strong> and the broader design toolchain</li>
+        <li>Experience defining and managing <strong>design systems</strong></li>
+        <li>Strong foundation in <strong>UX research</strong> and <strong>usability testing</strong></li>
+        <li>Track record of <strong>cross-functional collaboration</strong> with PMs and engineers</li>
+        <li>Ability to communicate ROI of design to <strong>executive stakeholders</strong></li>
+        <li>Portfolio demonstrating <strong>systems thinking</strong> and measurable outcomes</li>
+      </ul>`,
+    keywords: [
+      {id:'pd-1', match:'product design',             label:'Product Design'},
+      {id:'pd-2', match:'design strategy',            label:'Design Strategy'},
+      {id:'pd-3', match:'design system',              label:'Design System'},
+      {id:'pd-4', match:'design language',            label:'Design Language'},
+      {id:'pd-5', match:'user research',              label:'User Research'},
+      {id:'pd-6', match:'data analytics',             label:'Data Analytics'},
+      {id:'pd-7', match:'design thinking',            label:'Design Thinking'},
+      {id:'pd-8', match:'ideation',                   label:'Ideation'},
+      {id:'pd-9', match:'high-fidelity',              label:'High-Fidelity Prototypes'},
+      {id:'pd-10',match:'ui specification',           label:'UI Specifications'},
+      {id:'pd-11',match:'kpi',                        label:'KPIs'},
+      {id:'pd-12',match:'a/b testing',                label:'A/B Testing'},
+      {id:'pd-13',match:'accessibility',              label:'Accessibility'},
+      {id:'pd-14',match:'user advocacy',              label:'User Advocacy'},
+      {id:'pd-15',match:'figma',                      label:'Figma'},
+      {id:'pd-16',match:'usability testing',          label:'Usability Testing'},
+      {id:'pd-17',match:'cross-functional',           label:'Cross-Functional Collaboration'},
+      {id:'pd-18',match:'stakeholder',                label:'Executive Stakeholders'},
+      {id:'pd-19',match:'systems thinking',           label:'Systems Thinking'},
+      {id:'pd-20',match:'saas',                       label:'SaaS'},
+      {id:'pd-21',match:'prototype',                  label:'Prototyping'},
+      {id:'pd-22',match:'ux research',                label:'UX Research'},
+    ],
+  },
+
+  uxw: {
+    title: 'Senior UX Writer / Content Designer',
+    company: 'Forma Health',
+    location: 'Remote — US',
+    jd: `
+      <h3>About the Role</h3>
+      <p>Forma Health is looking for a <strong>Senior UX Writer</strong> and <strong>Content Designer</strong> to give our product a clear, human voice. You'll craft every word users encounter — from onboarding flows to error states — and ensure our <strong>content strategy</strong> scales coherently.</p>
+      <h3>Key Responsibilities</h3>
+      <ul>
+        <li>Write and edit all product <strong>microcopy</strong>, UI text, and in-app guidance</li>
+        <li>Develop and own the product <strong>content strategy</strong> and <strong>voice and tone</strong> guidelines</li>
+        <li>Audit and improve <strong>information architecture</strong> to reduce <strong>cognitive load</strong></li>
+        <li>Collaborate with UX Designers on <strong>user flows</strong> and <strong>wireframes</strong></li>
+        <li>Conduct <strong>content audits</strong> and maintain a <strong>content design system</strong></li>
+        <li>Apply <strong>plain language</strong> principles to complex healthcare concepts</li>
+        <li>Partner with <strong>accessibility</strong> teams to meet readability standards</li>
+        <li>Use <strong>usability testing</strong> and <strong>A/B testing</strong> to validate copy choices</li>
+        <li>Align content with <strong>SEO</strong> and <strong>localisation</strong> requirements</li>
+      </ul>
+      <h3>Requirements</h3>
+      <ul>
+        <li>4+ years of <strong>UX writing</strong> or <strong>content design</strong> experience in digital products</li>
+        <li>Strong command of <strong>plain language</strong> and readability best practices</li>
+        <li>Experience with <strong>content strategy</strong> and style guide creation</li>
+        <li>Proficiency in <strong>Figma</strong> and working directly in design files</li>
+        <li>Understanding of <strong>user research</strong> methods and applying insights to copy</li>
+        <li>Familiarity with <strong>localisation</strong> pipelines and translation workflows</li>
+        <li>Ability to influence <strong>stakeholders</strong> using writing rationale</li>
+        <li>Portfolio showing measurable impact of <strong>content design</strong> on user outcomes</li>
+      </ul>`,
+    keywords: [
+      {id:'uxw-1', match:'ux writing',                label:'UX Writing'},
+      {id:'uxw-2', match:'content design',            label:'Content Design'},
+      {id:'uxw-3', match:'microcopy',                 label:'Microcopy'},
+      {id:'uxw-4', match:'content strategy',          label:'Content Strategy'},
+      {id:'uxw-5', match:'voice and tone',            label:'Voice & Tone'},
+      {id:'uxw-6', match:'information architecture',  label:'Information Architecture'},
+      {id:'uxw-7', match:'cognitive load',            label:'Cognitive Load'},
+      {id:'uxw-8', match:'user flow',                 label:'User Flows'},
+      {id:'uxw-9', match:'wireframe',                 label:'Wireframes'},
+      {id:'uxw-10',match:'content audit',             label:'Content Audits'},
+      {id:'uxw-11',match:'plain language',            label:'Plain Language'},
+      {id:'uxw-12',match:'accessibility',             label:'Accessibility'},
+      {id:'uxw-13',match:'usability testing',         label:'Usability Testing'},
+      {id:'uxw-14',match:'a/b testing',               label:'A/B Testing'},
+      {id:'uxw-15',match:'seo',                       label:'SEO'},
+      {id:'uxw-16',match:'localisation',              label:'Localisation'},
+      {id:'uxw-17',match:'figma',                     label:'Figma'},
+      {id:'uxw-18',match:'user research',             label:'User Research'},
+      {id:'uxw-19',match:'stakeholder',               label:'Stakeholder Influence'},
+      {id:'uxw-20',match:'style guide',               label:'Style Guide'},
+      {id:'uxw-21',match:'design system',             label:'Design System'},
+      {id:'uxw-22',match:'readability',               label:'Readability'},
+    ],
+  },
+};
+
+// ─────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────
+let currentJob  = null;
+let foundKws    = [];
+let missingKws  = [];
+let atsScore    = 0;
+
+// ─────────────────────────────────────────────────────────
+// RESUME INPUT WIRING
+// ─────────────────────────────────────────────────────────
+const resumeInput = document.getElementById('resumeInput');
+const scanBtn     = document.getElementById('scanBtn');
+
+resumeInput.addEventListener('input', () => {
+  const n = resumeInput.value.length;
+  document.getElementById('charCount').textContent = `${n} character${n!==1?'s':''}`;
+  scanBtn.disabled = n < 40 || !currentJob;
+});
+
+// ─────────────────────────────────────────────────────────
+// SELECT JOB
+// ─────────────────────────────────────────────────────────
+function selectJob(key) {
+  currentJob = JOBS[key];
+
+  // Button states
+  ['uxr','uxd','pd','uxw'].forEach(k => {
+    document.getElementById(`jbtn-${k}`).classList.toggle('selected', k === key);
+  });
+
+  // Populate JD
+  document.getElementById('jd-title').textContent   = currentJob.title;
+  document.getElementById('jd-company').textContent = currentJob.company;
+  document.getElementById('jd-location').textContent= currentJob.location;
+  document.getElementById('jd-body').innerHTML      = currentJob.jd;
+
+  // Build keyword cloud
+  const cloud = document.getElementById('kw-cloud');
+  cloud.innerHTML = '';
+  currentJob.keywords.forEach(kw => {
+    const sp = document.createElement('span');
+    sp.className = 'kw';
+    sp.id = kw.id;
+    sp.textContent = kw.label;
+    cloud.appendChild(sp);
+  });
+
+  // Show panels
+  document.getElementById('jd-panel').classList.remove('hidden');
+  document.getElementById('sec-resume').classList.remove('hidden');
+  setStage(2);
+  document.getElementById('sec-resume').scrollIntoView({behavior:'smooth',block:'start'});
+
+  // Reset downstream
+  resetResults();
+
+  // Recheck scan button
+  scanBtn.disabled = resumeInput.value.length < 40;
+}
+
+// ─────────────────────────────────────────────────────────
+// SCAN
+// ─────────────────────────────────────────────────────────
+async function runScan() {
+  if (!currentJob || resumeInput.value.trim().length < 40) return;
+  scanBtn.disabled = true;
+  setStage(3);
+
+  document.getElementById('sec-results').classList.remove('hidden');
+  document.getElementById('loadingResults').classList.remove('hidden');
+  document.getElementById('sec-results').scrollIntoView({behavior:'smooth',block:'start'});
+
+  const lower = resumeInput.value.toLowerCase();
+  foundKws = []; missingKws = [];
+
+  currentJob.keywords.forEach(kw => {
+    const el = document.getElementById(kw.id);
+    if (lower.includes(kw.match)) {
+      foundKws.push(kw);
+      el.className = 'kw found';
+    } else {
+      missingKws.push(kw);
+      el.className = 'kw missing';
+    }
+  });
+
+  atsScore = Math.round((foundKws.length / currentJob.keywords.length) * 100);
+
+  await delay(1100);
+  document.getElementById('loadingResults').classList.add('hidden');
+  document.getElementById('resultsContent').classList.remove('hidden');
+
+  // Populate keyword boxes
+  const fEl = document.getElementById('foundKws');
+  const mEl = document.getElementById('missingKws');
+  fEl.innerHTML = ''; mEl.innerHTML = '';
+
+  foundKws.forEach(kw => {
+    const sp = document.createElement('span');
+    sp.className = 'kw found'; sp.textContent = kw.label; fEl.appendChild(sp);
+  });
+  missingKws.forEach(kw => {
+    const sp = document.createElement('span');
+    sp.className = 'kw missing'; sp.textContent = kw.label; mEl.appendChild(sp);
+  });
+
+  // Score
+  await delay(100);
+  animateScore(atsScore);
+
+  // Individuality meters
+  const kwPct     = atsScore;
+  const voicePct  = Math.max(8,  100 - atsScore * 0.82);
+  const langPct   = Math.max(12, 100 - atsScore * 0.65);
+
+  await delay(300);
+  setMeter('voice', voicePct);
+  setMeter('lang',  langPct);
+  setMeter('kw',    kwPct);
+
+  // Suggestions
+  await delay(700);
+  setStage(4);
+  document.getElementById('sec-sugg').classList.remove('hidden');
+  document.getElementById('loadingSugg').classList.remove('hidden');
+  document.getElementById('sec-sugg').scrollIntoView({behavior:'smooth',block:'start'});
+
+  await getSuggestions();
+}
+
+function setMeter(id, pct) {
+  document.getElementById(`mf-${id}`).style.width = pct + '%';
+  document.getElementById(`mv-${id}`).textContent = Math.round(pct) + '%';
+}
+
+function animateScore(target) {
+  const el = document.getElementById('scoreNum');
+  let cur = 0;
+  const step = target / 45;
+  const iv = setInterval(() => {
+    cur = Math.min(cur + step, target);
+    el.textContent = Math.round(cur);
+    if (cur >= target) {
+      clearInterval(iv);
+      el.className = 'score-big ' + (target < 28 ? 'score-poor' : target < 55 ? 'score-mid' : target < 78 ? 'score-ok' : 'score-good');
+    }
+  }, 25);
+
+  const v = document.getElementById('scoreVerdict');
+  const b = document.getElementById('scoreBody');
+  const f = foundKws.length, t = currentJob.keywords.length;
+
+  if (target < 28) {
+    v.textContent = '"Eliminated before review."';
+    b.textContent = `Only ${f} of ${t} required signals found. Your resume was filtered out before any human read it. Your experience, your context, your story — all invisible to an algorithm scanning for exact word matches.`;
+  } else if (target < 55) {
+    v.textContent = '"Low priority. Unlikely to advance."';
+    b.textContent = `${f} of ${t} keywords matched. You exist in the maybe pile — a category that typically means no. How you chose to describe your work doesn't align with the vocabulary the machine was trained to reward.`;
+  } else if (target < 78) {
+    v.textContent = '"Conditionally flagged for human review."';
+    b.textContent = `${f} of ${t} keywords detected. You're close, but the ATS will still rank you below candidates who've learned to speak its language fluently. The gap between "good enough" and "compliant" is where most skilled people quietly disappear.`;
+  } else {
+    v.textContent = '"Approved for human review."';
+    b.textContent = `${f} of ${t} keywords matched. You've passed the machine. But at what cost? Your resume now reads like a keyword checklist. The human who opens it may find themselves wondering where the actual person went.`;
+  }
+}
+
+// ─────────────────────────────────────────────────────────
+// AI SUGGESTIONS
+// ─────────────────────────────────────────────────────────
+async function getSuggestions() {
+  const resume     = resumeInput.value;
+  const missingList= missingKws.slice(0,6).map(k=>k.label).join(', ');
+  const foundList  = foundKws.map(k=>k.label).join(', ');
+
+  const prompt = `You are an ATS optimisation tool inside an ethics game that critiques how job seekers lose individuality when rewriting resumes for algorithms.
+
+Role: ${currentJob.title} at ${currentJob.company}
+
+Applicant resume:
+"""
+${resume}
+"""
+
+Keywords found: ${foundList || 'none'}
+Keywords missing: ${missingList || 'none — already fully compliant'}
+
+Generate exactly 4 rewrite suggestions. For each:
+1. Find a real phrase or sentence from the resume (or note a section that is absent)
+2. Original: the applicant's actual phrasing (keep their authentic voice)
+3. Compliant: an ATS-optimised rewrite that injects missing keywords — make it feel clinical and hollow
+4. whatWasLost: 1–2 sentences on the human quality erased in this rewrite
+
+Make the originals sound genuinely human. Make the compliant versions feel flat and corporate. Highlight the ethical tension.
+
+Respond ONLY with valid JSON — no markdown, no preamble:
+{
+  "suggestions": [
+    {
+      "keyword": "keyword targeted",
+      "original": "phrase from resume",
+      "compliant": "ATS-optimised version",
+      "whatWasLost": "what was erased"
+    }
+  ],
+  "closingQuote": "A single haunting sentence about what this process does to professional identity"
+}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data  = await res.json();
+    const raw   = data.content[0].text;
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const parsed= JSON.parse(clean);
+    document.getElementById('loadingSugg').classList.add('hidden');
+    renderSuggestions(parsed);
+  } catch(e) {
+    console.error(e);
+    document.getElementById('loadingSugg').classList.add('hidden');
+    renderFallback();
+  }
+}
+
+function renderSuggestions(data) {
+  const container = document.getElementById('suggContent');
+  container.innerHTML = '';
+
+  (data.suggestions || []).forEach((s, i) => {
+    const d = document.createElement('div');
+    d.className = 'sugg-card';
+    d.style.animationDelay = (i * 0.08) + 's';
+    d.innerHTML = `
+      <div class="sugg-card-top">
+        <div class="sugg-tag">Rewrite ${String(i+1).padStart(2,'0')}</div>
+        <div class="sugg-kw">${esc(s.keyword)}</div>
+      </div>
+      <div class="sugg-cols">
+        <div class="sugg-col orig">
+          <div class="sugg-col-label">Your Words</div>
+          <div class="sugg-text">${esc(s.original)}</div>
+        </div>
+        <div class="sugg-col comp">
+          <div class="sugg-col-label">ATS-Compliant Version</div>
+          <div class="sugg-text">${esc(s.compliant)}</div>
+        </div>
+      </div>
+      <div class="sugg-footer">${esc(s.whatWasLost)}</div>`;
+    container.appendChild(d);
+  });
+
+  if (data.closingQuote) {
+    document.getElementById('closingQuote').textContent = `"${data.closingQuote}"`;
+  }
+  document.getElementById('finalBlock').classList.remove('hidden');
+  setTimeout(() => document.getElementById('finalBlock').scrollIntoView({behavior:'smooth',block:'start'}), 300);
+}
+
+function renderFallback() {
+  document.getElementById('suggContent').innerHTML = `
+    <div class="sugg-card">
+      <div class="sugg-card-top"><div class="sugg-tag">System Note</div></div>
+      <div style="padding:24px;font-size:14px;color:var(--text-body);line-height:1.75;">
+        The engine couldn't reach the AI service for personalised rewrites — but the keyword scan above already tells the story.
+        Every red tag is a place where your authentic language didn't match the algorithm's expectations.
+        <br><br><strong style="color:var(--red);">That gap is the point.</strong>
+      </div>
+    </div>`;
+  document.getElementById('finalBlock').classList.remove('hidden');
+}
+
+// ─────────────────────────────────────────────────────────
+// STAGE + RESET
+// ─────────────────────────────────────────────────────────
+function setStage(n) {
+  for (let i=1;i<=4;i++) {
+    const el = document.getElementById(`st-${i}`);
+    el.classList.remove('active','done');
+    if (i < n) el.classList.add('done');
+    if (i === n) el.classList.add('active');
+  }
+}
+
+function resetResults() {
+  document.getElementById('sec-results').classList.add('hidden');
+  document.getElementById('sec-sugg').classList.add('hidden');
+  document.getElementById('resultsContent').classList.add('hidden');
+  document.getElementById('loadingResults').classList.add('hidden');
+  document.getElementById('loadingSugg').classList.add('hidden');
+  document.getElementById('suggContent').innerHTML = '';
+  document.getElementById('finalBlock').classList.add('hidden');
+  document.getElementById('foundKws').innerHTML = '';
+  document.getElementById('missingKws').innerHTML = '';
+  document.getElementById('scoreNum').textContent = '—';
+  document.getElementById('scoreNum').className = 'score-big';
+  document.getElementById('scoreVerdict').textContent = 'Calculating…';
+  document.getElementById('scoreBody').textContent = '';
+  ['voice','lang','kw'].forEach(id => {
+    document.getElementById(`mf-${id}`).style.width = '0%';
+    document.getElementById(`mv-${id}`).textContent = '—';
+  });
+}
+
+function resetGame() {
+  currentJob = null;
+  ['uxr','uxd','pd','uxw'].forEach(k => document.getElementById(`jbtn-${k}`).classList.remove('selected'));
+  document.getElementById('jd-panel').classList.add('hidden');
+  document.getElementById('sec-resume').classList.add('hidden');
+  resumeInput.value = '';
+  document.getElementById('charCount').textContent = '0 characters';
+  resetResults();
+  setStage(1);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ─────────────────────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────────────────────
+function delay(ms){return new Promise(r=>setTimeout(r,ms));}
+function esc(s){
+  if(!s)return'';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
